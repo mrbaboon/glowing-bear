@@ -14,17 +14,9 @@
       body {
         padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
       }
-      table#board td{
-        text-align: center;
-        vertical-align: middle;
-        height: 100px;
-        border: 1px solid #888;
-        font-size: 60px;
-      }
 
     </style>
     <link href="resources/css/bootstrap-responsive.css" rel="stylesheet">
-
     <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
       <script src="../assets/js/html5shiv.js"></script>
@@ -36,6 +28,7 @@
       <link rel="apple-touch-icon-precomposed" sizes="72x72" href="../assets/ico/apple-touch-icon-72-precomposed.png">
                     <link rel="apple-touch-icon-precomposed" href="../assets/ico/apple-touch-icon-57-precomposed.png">
                                    <link rel="shortcut icon" href="../assets/ico/favicon.png">
+    <script src="https://cdn.firebase.com/v0/firebase.js"></script>
   </head>
 
   <body>
@@ -60,65 +53,18 @@
 
     <div class="container">
       <div class="row">
-      </div>
-      <div class="row">
-        <div class="span8">
-          <table class="table table-bordered table-striped" id="board">
-            <tbody>
-              <tr>
-                <td>W</td>
-                <td>X</td>
-                <td>A</td>
-                <td>C</td>
-              </tr>
-              <tr>
-                <td>J</td>
-                <td>T</td>
-                <td>E</td>
-                <td>E</td>
-              </tr>
-              <tr>
-                <td>K</td>
-                <td>I</td>
-                <td>U</td>
-                <td>H</td>
-              </tr>
-              <tr>
-                <td>P</td>
-                <td>S</td>
-                <td>R</td>
-                <td>V</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="span4">
-          <table class="table table-bordered">
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Player</th>
-                <th>Score</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>1</td>
-                <td>Alligator</td>
-                <td>9001</td>
-              </tr>
-              <tr>
-                <td>2</td>
-                <td>Bat</td>
-                <td>8999</td>
-              </tr>
-              <tr>
-                <td>3</td>
-                <td>Sloth</td>
-                <td>-20</td>
-              </tr>
-            </tbody>
-          </table>
+        <div class="span12">
+          <form class="form-horizontal">
+            <div class="control-group">
+              <label class="control-label">Word</label>
+              <div class="controls">
+                <input type="text" class="input-medium" />
+              </div>
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary">Submit!</button>
+            </div>
+          </form>
         </div>
       </div>
 
