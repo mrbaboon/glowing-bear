@@ -25,10 +25,11 @@
     <!-- Fav and touch icons -->
     <link rel="apple-touch-icon-precomposed" sizes="144x144" href="../assets/ico/apple-touch-icon-144-precomposed.png">
     <link rel="apple-touch-icon-precomposed" sizes="114x114" href="../assets/ico/apple-touch-icon-114-precomposed.png">
-      <link rel="apple-touch-icon-precomposed" sizes="72x72" href="../assets/ico/apple-touch-icon-72-precomposed.png">
-                    <link rel="apple-touch-icon-precomposed" href="../assets/ico/apple-touch-icon-57-precomposed.png">
-                                   <link rel="shortcut icon" href="../assets/ico/favicon.png">
-    <script src="https://cdn.firebase.com/v0/firebase.js"></script>
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="../assets/ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="../assets/ico/apple-touch-icon-57-precomposed.png">
+    <link rel="shortcut icon" href="../assets/ico/favicon.png">
+
+    <link href="resources/css/jquery.pnotify.default.css" media="all" rel="stylesheet" type="text/css" />
   </head>
 
   <body>
@@ -53,12 +54,12 @@
 
     <div class="container">
       <div class="row">
-        <div class="span12">
-          <form class="form-horizontal">
+        <div class="span4 offset4">
+          <form class="form-horizontal" id="nameForm">
             <div class="control-group">
-              <label class="control-label">Word</label>
+              <label class="control-label">WHATS YO NAME</label>
               <div class="controls">
-                <input type="text" class="input-medium" />
+                <input type="text" id="name" class="input-medium" />
               </div>
             </div>
             <div class="form-actions">
@@ -67,13 +68,154 @@
           </form>
         </div>
       </div>
+      <div class="row hide">
+        <div class="span4 offset4">
+          <h5 id="currentUser"></h5>
+        </div>
+        <div class="span12">
+          <form class="form-horizontal" id="boggleform">
+            <div class="control-group">
+              <label class="control-label">Word</label>
+              <div class="controls">
+                <input type="text" id="word" class="input-medium" />
+              </div>
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary">Submit!</button>
+            </div>
+          </form>
+        </div>
+      </div>
+      <div class="row">
+        <div class="span4 offset4">
+          <ul id="correctWords">
+
+          </ul>
+        </div>
+      </div>
+      <div class="row">
+        <div class="span4 offset4">
+          <table class="table table-bordered" id="usertable">
+            <tbody>
+            </tbody>
+          </table>
+        </div>
+      </div>
 
     </div> <!-- /container -->
 
     <!-- Le javascript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
-    <script src="../assets/js/jquery.js"></script>
+    <script src="https://cdn.firebase.com/v0/firebase.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
     <script src="resources/js/bootstrap.min.js"></script>
+    <script src="resources/js/jquery.pnotify.min.js"></script>
+    <script type="text/javascript">
+
+      var game = new Firebase('https://glowing-bear.firebaseIO.com/games/123/')
+
+      var root = new Firebase('https://glowing-bear.firebaseIO.com/');
+      var users = new Firebase('https://glowing-bear.firebaseIO.com/users');
+      var user;
+      var thisUserName = "";
+      var usernames = [];
+
+      users.on('child_added', function(userSnap) {
+        var added_user = userSnap.val();
+        user_string = "";
+        user_string += "<tr id='row_"+added_user.name+"'><td>"+added_user.name+"</td>";
+        user_string += "<td id='score_"+added_user.name+"'>"+added_user.score+"</td>";
+        user_string += "</tr>";
+
+        $("#usertable tbody").append(user_string);
+        usernames.push(added_user.name);
+      });
+
+      users.on('child_removed', function(userSnap) {
+        var del_user = userSnap.val();
+        console.log(del_user)
+        $("tr#row_"+del_user.name).remove();
+      });
+
+      game.child('man').set(1);
+      game.child('woman').set(1);
+      game.child('child').set(1);
+
+      $(document).ready(function(){
+        /*
+        $.pnotify({
+            title: 'Regular Notice',
+            text: 'Check me out! I\'m a notice.',
+            styling: 'bootstrap',
+            animate_speed: 'fast',
+            delay: '2000'
+        });
+        */
+        $("#nameForm").submit(function(){
+            var uniqueuser = false;
+            console.log("Submitting");
+            thisUserName = $("#nameForm input#name").val();
+
+            users.child(thisUserName).once('value', function(snapshot) {
+               if (snapshot.val() === null) {
+                user = users.child(thisUserName).set({
+                  'score':0,
+                  'name': thisUserName
+                }, function(status){
+                  userref = new Firebase("https://glowing-bear.firebaseIO.com/users/"+thisUserName);
+                  userref.onDisconnect().remove();
+                  $("#currentUser").html("Playing as "+thisUserName);
+
+                });
+
+
+                $("#nameForm").parents(".row").slideUp(500,function(){
+                  $("#boggleform").closest(".row").slideDown();
+                });
+               } else {
+                 alert('gotta be unique son');
+               }
+            });
+            return false;
+        });
+        $("#boggleform").submit(function(){
+          $("#boggleform .control-group").removeClass("error");
+          $("#boggleform .controls span").remove();
+          var $guess = $("#boggleform input#word");
+
+          if($guess.val() == ''){
+            $("#boggleform .control-group").addClass("error");
+            $("#boggleform .controls").append("<span class='help-inline'>Enter a word</span>");
+            $guess.val('');
+            return false;
+          }
+          game.child($guess.val()).once('value', function(snapshot) {
+            if (snapshot.val() === null) {
+              /* BAD GUESS */
+            }else{
+              /* GREAT SUCCESS */
+
+              user_url = 'users/'+thisUserName;
+              
+              root.child(user_url+'/wordlist/'+ $guess.val()).once('value', function(snapshot){
+                if(snapshot.val()===null){
+                  
+                  root.child(user_url+'/wordlist/'+ $guess.val()).set($guess.val());
+                  root.child(user_url).once('value', function(snapshot) {
+                    root.child(user_url).update({'score':snapshot.val().score+1});
+                    $("#correctWords").prepend("<li>"+$guess.val()+"</li>");
+                  });
+                }
+              });
+            }
+            $guess.val('');
+          });
+            
+
+          return false;
+        });
+      });
+    </script>
   </body>
 </html>
