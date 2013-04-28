@@ -113,10 +113,10 @@
     <script src="resources/js/jquery.pnotify.min.js"></script>
     <script type="text/javascript">
 
-      var game = new Firebase('https://glowing-bear.firebaseIO.com/games/123/')
+      var game = new Firebase('https://bdangor.firebaseIO.com/games/123/')
 
-      var root = new Firebase('https://glowing-bear.firebaseIO.com/');
-      var users = new Firebase('https://glowing-bear.firebaseIO.com/users');
+      var root = new Firebase('https://bdangor.firebaseIO.com/');
+      var users = new Firebase('https://bdangor.firebaseIO.com/users');
       var user;
       var thisUserName = "";
       var usernames = [];
@@ -137,10 +137,6 @@
         console.log(del_user)
         $("tr#row_"+del_user.name).remove();
       });
-
-      game.child('man').set(1);
-      game.child('woman').set(1);
-      game.child('child').set(1);
 
       $(document).ready(function(){
         /*
@@ -190,7 +186,7 @@
             $guess.val('');
             return false;
           }
-          game.child($guess.val()).once('value', function(snapshot) {
+          game.child("wordList/"+$guess.val()).once('value', function(snapshot) {
             if (snapshot.val() === null) {
               /* BAD GUESS */
             }else{
@@ -198,10 +194,10 @@
 
               user_url = 'users/'+thisUserName;
               
-              root.child(user_url+'/wordlist/'+ $guess.val()).once('value', function(snapshot){
+              root.child(user_url+'/wordList/'+ $guess.val()).once('value', function(snapshot){
                 if(snapshot.val()===null){
                   
-                  root.child(user_url+'/wordlist/'+ $guess.val()).set($guess.val());
+                  root.child(user_url+'/wordList/'+ $guess.val()).set($guess.val());
                   root.child(user_url).once('value', function(snapshot) {
                     root.child(user_url).update({'score':snapshot.val().score+1});
                     $("#correctWords").prepend("<li>"+$guess.val()+"</li>");

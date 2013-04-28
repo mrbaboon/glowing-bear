@@ -57,8 +57,21 @@
 
     <div class="container">
       <div class="row">
-        <div class="span4 offset4">
+        <div class="span4 offset2">
           <table class="table table-bordered table-striped" id="board"></table>
+        </div>
+        <div class="span4">
+          <table id="scoreboard" class="table table-bordered">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Score</th>
+              </tr>
+            </thead>
+            <tbody>
+
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
@@ -92,7 +105,20 @@
     <script src="resources/js/boggle-gt.js"></script>
 
     <script>
-      boggleGT.generateTable();
+    users = new Firebase("https://bdangor.firebaseIO.com/users/")
+
+    users.on("child_added",function(snapshot){
+      $("table#scoreboard tbody").append("<tr id='score_"+snapshot.name()+"'><td>"+snapshot.name()+"</td><td  class='score'>"+snapshot.val().score+"</td></tr>");
+    });
+    users.on("child_changed",function(snapshot){
+      var username = snapshot.name();
+      var score = snapshot.val().score;
+
+      $("table#scoreboard tbody tr#score_"+username+" .score").html(score);
+
+    });
+
+    boggleGT.generateTable();
     </script>
     
     <button onclick="boggleGT.generateTable();">New Game</button>
